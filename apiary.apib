@@ -14,11 +14,7 @@ Authorization token is obtained through HTTP Basic Auth or by login request for 
 ` `
 
 
-Successful response is code 200. Errors are returned as standard HTTP errors with corresponding error code (4xx - client error, 5xx - server error) and description 
-
-When force error occurs server returns status code 449 and object with following schema
-https://drive.google.com/file/d/0B1_u4k6eQMDqc3NnZy1Zcm53azQ/view?usp=sharing
-Client displays alert constructed from force object and responses with force_answer or force_cancel. Only POST methods implements force error.
+Successful response is code 200. Errors are returned as standard HTTP errors with corresponding error code (4xx - client error, 5xx - server error) and description.
 
 ` `
 
@@ -70,15 +66,8 @@ All parameters and request attributes are optional by default.
 
 ### Get menu (NEW) [GET /menu?timespan={timespan}&firstDay={firstDay}&canteenId={canteenId}]
 Get menu for customer. If no attributes are provided menu is based on customer default preferences set in Septim.
+Menu item is combination of meal and date. MealId and Date creates compound id of item.
 
-?? V parametrech není zdokumentovaný firstDate. A upřímně teď už ani netuším rozdíl mezi date a FirstDate. Pokud na to také nepřijdete v rámci toho, jak se to bude realizovat, tak bych nechal jenom firstDate.
-    
-    -- Už také nevím, nechávám jenom firstDay
-
-?? Mám za to, že jsme se bavili, že položka menu (nabídky) nemá IDčko, objednáváme recepturu.   
- 
- -- O tom jsme se nebavili, ani to není možné, protože dle informace od Vás lze objednávat jídlo i když nemá přiřazenou recepturu (mail 5. 12. 2018 17:59) - položka menu (neboli jídlo) má u sebe cenu. Id jídla je několikrát zmiňováno ve Vašem zadání i a zároveň při řešení https://github.com/MRzr/webcarecanteenapi/pull/1/files/9bde635752d960ff7a82b89a4af370765f413eb8
- 
 
 + Parameters 
     - firstDay:  `dd-MM-yyyy` (string, optional) - First day of requested menu.
@@ -119,10 +108,6 @@ Get list of canteens for customer.
 Create direct order.
 Returns order confirmation.
 
-?? Měli by jsme objednávat produkt ne menu, to v podstatě neexistuje jako záznam
-    
-    -- Viz výše
-
 + Request (application/json)
     + Headers
     
@@ -142,9 +127,6 @@ Returns order confirmation.
 Create order from cart.
 Returns order confirmation.
 
-?? Stejný problém s identifikací co objednáváme    
-    
-    -- Viz výše
 + Request (application/json)
     + Headers
         
@@ -164,9 +146,6 @@ Returns order confirmation.
 
 Check if order can be placed.
 
-?? Stejný problém s identifikací co objednáváme
-    
-    -- Viz výše
 + Request (application/json)
     + Headers
 
@@ -202,9 +181,6 @@ Returns customer's Basic Auth token. Identified by card reader.
 
 Request customer account top up. Webcare api creates unique transaction id for payment gateway.
 
-?? Je to v souladu s aktuálním stavem práce s branami? Nevím o ničem, jenom vím, že jsme dělali nějaké změny. 
-    
-    -- Ano, systém je stejný jaký se závádí do první verze - jediný rozdíl je v tom, že tady platba není vázaná na objednávku
 + Request (application/json)
     + Headers
     
@@ -219,12 +195,9 @@ Request customer account top up. Webcare api creates unique transaction id for p
 
 ### Get canteen orders (NEW) [GET /customer/canteenorders]
 
-Request customer account top up. Webcare api creates unique transaction id for payment gateway.
+Get customers active canteen orders.
+    
 
-?? Komentář je asi dost blbě
- 
- -- Moje chyba opravím
- 
 + Request (application/json)
     + Headers
     
@@ -232,21 +205,18 @@ Request customer account top up. Webcare api creates unique transaction id for p
 
 + Response 200 (application/json)
     + Attributes (array[CanteenOrder])
-?? Struktura odpovědi je divná. Nemělo by tam být menuItem (to co z něj potřebujeme už máme správně v CanteenOrder)
-?? Místo menuItem potřebujeme product. Párování mezi nabídkou a objednávkami musíte dělat přes datum a productId.
-?? Nebojte se do tohoto komentáře dát informaci o způsobu párování za mně to sem patří. 
-    -- Žádné párování neprobíhá na straně klientské aplikace neprobíhá, domluvili jsme se že chodí veškerá data kompletní (stejně jako je v Get menu). ProductId může být null a i když má hodnotu, tak není záruka, že máme zrovna máme detail receptury - v daný moment máme pouze receptury, které jsou zobrazeny ve výpisu.
+
+    
+
+    
 
 ### Top up payment result (NEW) [POST /customer/topup/result]
 
-Request between private Payment bridge and Septim API. Confirms successful payment of transaction or cancels transaction in case of error in payment.
+Request between private Payment bridge and Septim API. 
+Request is triggered after notification from Payemnt Gateway and sets transaction status in Septim.
+Confirms successful payment of transaction or cancels transaction in case of error in payment. If payment is successful paid amount is added to customers balance.
 Request is authorized with admin credentials.
 
-?? Nerozumím tomu, proč máme dvě API metody. Až to bude k tomu (tedy víte že je zaplaceno), tak nabijeme konto.
-?? Teoreticky dokážu pochopit, že by jsme Vám uchovávali identifikátor transakce mezi požadavkem na platbu a potvrzením platby. Ale pak to tady musí být popsané.
-    
-    -- Touto metodou payment bridge předá zprávu, že došlo k úspěšnému zaplacení transakce přes platební bránu.
-    
 + Request (application/json)
     + Headers
     
@@ -258,10 +228,11 @@ Request is authorized with admin credentials.
     + Attributes
         + success: true (boolean) - Confirmation of successful request
         
-## Web API requests [/api]
+
+## Payment bridge requests [/paymentbridge]
 
 
-### Get payment link for (NEW) [POST /api/topup/link]
+### Get payment link for (NEW) [POST /paymentbridge/topup/link]
 
 Not part of Septim API
     
@@ -269,9 +240,6 @@ Request between client and payment bridge.
 
 After payment validation, browser is redirected to specified return URL with GET parameters withpayment result. (?paymentSuccess=true)
 
-?? tomuhle moc nerozumím a věta "Request between client and web api." tomu nepomáhá. 
-    
-    -- Nové označení je payment bridge - aplikace, která se stará o platby přes bránu. Tato část se netýká Septimu, ale zajištuje komunikaci mezi klientskou aplikací a payment bridge.
 
 + Request (application/json)
     + Headers
@@ -325,7 +293,7 @@ After payment validation, browser is redirected to specified return URL with GET
 - var-text
 - input-text
 
-## Product
+## Product (fixed-type)
 
 - id: 123 (number, required) - Product unique identificator
 - name: Soup (string, required) - Product display name
@@ -336,27 +304,29 @@ After payment validation, browser is redirected to specified return URL with GET
 - additionalData (array[AdditionalData], optional, fixed-type) - Other product informations
 - allergens (array[ProductAllergen], required, fixed-type) - List of allergens in product
 
-## ProductAllergen
+## ProductAllergen (fixed-type)
 
 - shortName: 01 (string, required) - Short name of allergen
 - longName: Shrimp (string, required) - Long name of allergen
 
 
-## OrderItem
-- menuItemId: 123 (number, required) - Id of meal to order
-- quantity: 2 (number, required) - Quantity of ordered product. If not provided quantity is 1.
+## OrderItem (fixed-type)
+- mealId: 123 (number, required) - Id of meal to order
+- date: `dd-MM-yyyy` (string, required) - Date of order for this meal
+- quantity: 2 (number, required) - Quantity of ordered product.
+- productId: 123 (number, optional) - Id of product to order (if avaiable)
 
 
-## Canteen 
+## Canteen  (fixed-type)
 - id: 77 (number, required) - Unique identificator of outlet
 - name: Outlet 1 (string, required) - Display name of outlet
 
-## MenuRequest 
+## MenuRequest  (fixed-type)
 - date:  `dd-MM-yyyy` (string, optional) - Date of order
 - timespan: week (MenuTimeSpan, optional) - selected time span of order
 - canteenId: 12 (number, optional) - id of selected canteen
 
-## MenuResponse
+## MenuResponse (fixed-type)
 - timespan: week (MenuTimeSpan, required, sample) - Displayed timespan of menu
 - canteenId: 123 (number, required) - Canteen id of menu
 - filters (array[MenuFilter], required, fixed-type) - Available filters for menu
@@ -364,8 +334,8 @@ After payment validation, browser is redirected to specified return URL with GET
 
 ## Menu (array[MenuItem], required, fixed-type)
 
-## MenuItem
-- id: 23 (number, required) - Id of menu item
+## MenuItem (fixed-type)
+- mealId: 23 (number, required) - Id of meal for menu item
 - date:  `dd-MM-yyyy` (string, required) - Date of menu item
 - price: 23 (number, required) - Price of item
 - name: Menu 1 (string, required) - Name of menu item
@@ -374,18 +344,17 @@ After payment validation, browser is redirected to specified return URL with GET
 - group: launch (string, required) - Group of meal for menu item
 - product (Product, nullable, optional) - Product recipe
 
-## MenuFilter
+## MenuFilter (fixed-type)
 - value: launch (string, required) - Value for filter
 - label: Obed (string, required) - Label of filter
 
-## OrderDirectRequest
+## OrderDirectRequest (fixed-type)
 - price: 300 (number, required) - Calculated price of order, price is verified with DB and if doesn't match error is thrown.
-- orderDate: `dd-MM-yyyy` (string, required) - Date order will be created for
 - canteenId: 12 (number, required) - Canteen for order
 - item (OrderItem, required) - Item to order
 - additionalData (array[AdditionalDataRequest], optional) - Other order data
 
-## OrderCartRequest
+## OrderCartRequest (fixed-type)
 - price: 300 (number, required) - Calculated price of order, price is verified with DB and if doesn't match error is thrown.
 - orderDate: `dd-MM-yyyy` (string, required) - Date order will be created for
 - canteenId: 12 (number, required) - Canteen for order.
@@ -393,7 +362,7 @@ After payment validation, browser is redirected to specified return URL with GET
 - additionalData (array[AdditionalDataRequest], optional) - Other order data
 
 
-## Order
+## Order (fixed-type)
 - id: abc (string, required) - Unique identification of order
 - date:  `dd-MM-yyyy` (string, required) - Date of order
 - filter: launch (string, required) - Group of order
@@ -403,23 +372,22 @@ After payment validation, browser is redirected to specified return URL with GET
 - items (array[OrderItem], required, fixed-type) - List of ordered products
 - additionalData (array[AdditionalData],optional, fixed-type) - Other order informations
 
-## CanteenOrder
+## CanteenOrder (fixed-type)
 - id: abc (string, required) - Unique identification of order
-- date:  `dd-MM-yyyy` (string, required) - Date of order
 - canteenId: 77 (number, required) - Identification of canteen
-- quantity: 2 (number, required) - Quantity of ordered product. If not provided quantity is 1.
 - orderPrice: 232 (number, required) - The order price.
+- name: MENU 1: Soup (string, required) - Name of canteen order.
 - cancelStatus: POSSIBLE (CancelStatus, sample, required) - Cancel options
-- menuItem (MenuItem, required) - Ordered menu item
+- orderItem (OrderItem, required) - Ordered item
 
 
-## OrderConfirmation
+## OrderConfirmation (fixed-type)
 - id: abc (string, required) - Unique identification of order
 - status: ACTIVE (OrderStatus, required) - Current status code of order
 - orderPrice: 232 (number, required) - The order price.
 
 
-## AdditionalDataBase
+## AdditionalDataBase (fixed-type)
 - variableId: customerCountry (string, required) - Id of data object in administration
 - value: Czech Republic (string, required) - Value of data object
 
@@ -431,17 +399,17 @@ After payment validation, browser is redirected to specified return URL with GET
 - target (string, optional) - target of data object
 
 
-##GatewayRequest
+##GatewayRequest (fixed-type)
 - toBePaid: 111 (number, required) - The amount, which should be paid.
-- returnUrl: http://return.url/ (string, required) -  Defines return adress, after payement completion
+- returnUrl: http://return.url/ (string, required) -  Defines return adress, after payment completion
 
-##GatewayResponse
+##GatewayResponse (fixed-type)
 - gatewayLink: http://link.to.gateway/payment (string, required) - Link to payment gateway
 
 
-## PaymentResult
+## PaymentResult (fixed-type)
 - transactionId: abc (string, required) - Id of transaction
 - paymentSuccessful: true (boolean, required) - Result of payment
 
-## PaymentResultResponse
+## PaymentResultResponse (fixed-type)
 - paid: 23 (number, required) - amount paid by customer
