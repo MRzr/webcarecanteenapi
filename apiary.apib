@@ -330,7 +330,7 @@ After payment validation, browser is redirected to specified return URL with GET
 - timespan: week (MenuTimeSpan, required, sample) - Displayed timespan of menu
 - canteenId: 123 (number, required) - Canteen id of menu
 - filters (array[MenuFilter], required, fixed-type) - Available filters for menu
-- menu (array[Menu], required, fixed-type) - Menu by days
+- menu (Menu, required, fixed-type) - Menu by days
 
 ## Menu (array[MenuItem], required, fixed-type)
 
@@ -377,6 +377,7 @@ After payment validation, browser is redirected to specified return URL with GET
 - canteenId: 77 (number, required) - Identification of canteen
 - orderPrice: 232 (number, required) - The order price.
 - name: MENU 1: Soup (string, required) - Name of canteen order.
+- orderStatus: ACTIVE (OrderStatus, sample, required) - Current status code of order
 - cancelStatus: POSSIBLE (CancelStatus, sample, required) - Cancel options
 - group: launch (string, required) - Group of meal for menu item
 - orderItem (OrderItem, required) - Ordered item
