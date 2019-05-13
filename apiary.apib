@@ -114,17 +114,43 @@ Returns order confirmation.
             Authorization: abc  (customer credentials)
     + Attributes (OrderDirectRequest)
 
-        
++ Response 200 (application/json)
+    + Attributes
+        + success: true (boolean)
+
+### Cancel order (NEW) [POST /order/cancel]
+
+Request order cancel.
+Returns order confirmation.
+
++ Request (application/json)
+    + Headers
+    
+            Authorization: abc  (customer credentials)
+    + Attributes (OrderItem)
 
 + Response 200 (application/json)
     + Attributes
         + success: true (boolean)
-        
 
-        
+### Exchange order (NEW) [POST /order/exchange]
+
+Offer order for exchange
+Returns order confirmation.
+
++ Request (application/json)
+    + Headers
+    
+            Authorization: abc  (customer credentials)
+    + Attributes (OrderItem)
+
++ Response 200 (application/json)
+    + Attributes
+        + success: true (boolean)
+
 ### Create order from cart (NEW) [POST /order/cart]
 
-Create order from cart.
+Create order from cart. Negative value of quantity means that the order item is requested to be cancelled.
 Returns order confirmation.
 
 + Request (application/json)
@@ -315,6 +341,7 @@ After payment validation, browser is redirected to specified return URL with GET
 - date: `dd-MM-yyyy` (string, required) - Date of order for this meal
 - quantity: 2 (number, required) - Quantity of ordered product.
 - productId: 123 (number, optional) - Id of product to order (if avaiable)
+- canteenId: 12 (number, required) - Canteen for order.
 
 
 ## Canteen  (fixed-type)
@@ -350,14 +377,12 @@ After payment validation, browser is redirected to specified return URL with GET
 
 ## OrderDirectRequest (fixed-type)
 - price: 300 (number, required) - Calculated price of order, price is verified with DB and if doesn't match error is thrown.
-- canteenId: 12 (number, required) - Canteen for order
 - item (OrderItem, required) - Item to order
 - additionalData (array[AdditionalDataRequest], optional) - Other order data
 
 ## OrderCartRequest (fixed-type)
 - price: 300 (number, required) - Calculated price of order, price is verified with DB and if doesn't match error is thrown.
 - orderDate: `dd-MM-yyyy` (string, required) - Date order will be created for
-- canteenId: 12 (number, required) - Canteen for order.
 - items (array[OrderItem], required, fixed-type) - Items to order
 - additionalData (array[AdditionalDataRequest], optional) - Other order data
 
@@ -366,7 +391,6 @@ After payment validation, browser is redirected to specified return URL with GET
 - id: abc (string, required) - Unique identification of order
 - date:  `dd-MM-yyyy` (string, required) - Date of order
 - filter: launch (string, required) - Group of order
-- canteenId: 77 (number, required)
 - status: ACTIVE (OrderStatus, sample, required) - Current status code of order
 - price: 232 (number, required) - Total price of order
 - items (array[OrderItem], required, fixed-type) - List of ordered products
@@ -374,7 +398,6 @@ After payment validation, browser is redirected to specified return URL with GET
 
 ## CanteenOrder (fixed-type)
 - id: abc (string, required) - Unique identification of order
-- canteenId: 77 (number, required) - Identification of canteen
 - orderPrice: 232 (number, required) - The order price.
 - name: MENU 1: Soup (string, required) - Name of canteen order.
 - orderStatus: ACTIVE (OrderStatus, sample, required) - Current status code of order
