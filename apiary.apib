@@ -99,6 +99,21 @@ Get list of canteens for customer.
 + Response 200 (application/json)
     + Attributes (array[Canteen])
 
+## Product list [/products]
+
+### Get product details by ids (CHANGED) [GET /products/details?productIds={ids}&modifiedOnly={modifiedOnly}]
+
+Parameter productIds defines which product details should be returned, if combined with modifiedOnly, results are filtered to contain only newly updated results from provided list of ids.
+
+
+Return list of requested product details.
+
++ Parameters
+    - ids:  1,2,3 (array[number], required) - List of product ids to be returned.
+    - modifiedOnly: true  (bool, required) - Filter list to contain only updated products.
++ Response 200  (application/json)
+    + Attributes (array[Product], fixed-type, required)
+
 
 ## Orders  [/order]
 
@@ -329,8 +344,22 @@ After payment validation, browser is redirected to specified return URL with GET
 - description: Product Description (string, required) - Product description text
 - size: 200 ml (string, required) - Size of product (weight, volume...)
 - healthIndex: HEALTHY (HealthIndex, sample, nullable, optional)
+- allowDecimalAmount: true (boolean, optional) - If it is possible to order decimal amout of product
 - additionalData (array[AdditionalData], optional, fixed-type) - Other product informations
 - allergens (array[ProductAllergen], required, fixed-type) - List of allergens in product
+- modifierGroups (array[ProductModifierGroup], fixed-type, required) - List of modifier groups
+- recommendedProducts (array[RecommendedProduct], fixed-type, required) - List of products recommended for this product
+
+## RecommendedProduct (fixed-type)
+- productId: 123 (number, required) - Product unique identificator
+- shortDescription: Special Deal (string, required) - short description of recommendation
+- description: Because you have ordered last time (string, required) long description of recommendation
+
+## ProductModifierGroup (fixed-type)
+- name: Způsob přípravy (string, required) - Display name of modifier group
+- required: true (boolean, required) - Determines if modifier group is required or optional
+- multiple: false (boolean, required) - Determines if customer can select one or more options in modifier group
+- modifiers: 1 (array[number], fixed-type, required) - Id's of modifiers (products)
 
 ## ProductAllergen (fixed-type)
 
