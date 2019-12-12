@@ -34,33 +34,43 @@ All parameters and request attributes are optional by default.
 
 ` `
 
-#Enumarated types
-## CancelStatus (enum[string])
-- NOT_POSSIBLE - Cannot be canceled
-- FOR_EXCHANGE - Can be offered for exchange
-- POSSIBLE - Can be canceled
-
-## OrderStatus (enum[string])
-- ACTIVE - Current orders
-- CLOSED - Past orders
-- FOR_EXCHANGE - Order offered for exchange
-- CANCELED - Canceled orders
-
-## MenuStatus (enum[string])
-- CLOSED - Orders closed
-- SOLD_OUT - Sold out
-- SINGLE_ITEM - Available to order single item
-- MULTIPLE - Available to order multiple items
-
-## MenuTimeSpan (enum[string])
-- DAY - 1 day time span
-- WEEK - 7 day time span
-- TIMESPAN - Configured time span of menu
-
-## HealthIndex (enum[string])
-- UNHEALTHY - Unhealthy - red
-- NORMAL - Normal - orange
-- HEALTHY - Healthy - green
+    #Enumarated types
+    ## CancelStatus (enum[string])
+    - NOT_POSSIBLE - Cannot be canceled
+    - FOR_EXCHANGE - Can be offered for exchange
+    - POSSIBLE - Can be canceled
+    
+    ## OrderStatus (enum[string])
+    - ACTIVE - Current orders
+    - CLOSED - Past orders
+    - FOR_EXCHANGE - Order offered for exchange
+    - CANCELED - Canceled orders
+    
+    ## MenuStatus (enum[string])
+    - CLOSED - Orders closed
+    - SOLD_OUT - Sold out
+    - SINGLE_ITEM - Available to order single item
+    - MULTIPLE - Available to order multiple items
+    
+    ## MenuTimeSpan (enum[string])
+    - DAY - 1 day time span
+    - WEEK - 7 day time span
+    - TIMESPAN - Configured time span of menu
+    
+    ## HealthIndex (enum[string])
+    - UNHEALTHY - Unhealthy - red
+    - NORMAL - Normal - orange
+    - HEALTHY - Healthy - green
+    
+    ## PaymentStatus (enum[number])
+    - O - Payment initialized
+    - 1 - Payment successful, not confirmed
+    - 2 - Payment successful
+    - 3 - Payment failed
+    
+    ## OrderPayment (enum[string])
+    - creditcard
+    - account
 
 ## Menu [/menu]
 
@@ -336,6 +346,21 @@ After payment validation, browser is redirected to specified return URL with GET
 - var-text
 - input-text
 
+
+## PaymentStatus (enum[number])
+
+### Members
+
++ `0` - Payment initialized
++ `1` - Payment successful, not confirmed
++ `2` - Payment successful
++ `3` - Payment failed
+
+## OrderPayment (enum[string])
+- creditcard
+- account
+
+
 ## Product (fixed-type)
 
 - id: 123 (number, required) - Product unique identificator
@@ -456,16 +481,20 @@ After payment validation, browser is redirected to specified return URL with GET
 
 
 ##GatewayRequest (fixed-type)
+- transactionId: abc (string, required) - Identification of transaction.
 - toBePaid: 111 (number, required) - The amount, which should be paid.
-- returnUrl: http://return.url/ (string, required) -  Defines return adress, after payment completion
+- successUrl: http://return.url/ (string, required) -  Defines success return adress, after payment completion
+- failUrl: http://return.url/ (string, required) -  Defines fail return adress, after payment completion
 
 ##GatewayResponse (fixed-type)
 - gatewayLink: http://link.to.gateway/payment (string, required) - Link to payment gateway
 
 
 ## PaymentResult (fixed-type)
-- transactionId: abc (string, required) - Id of transaction
-- paymentSuccessful: true (boolean, required) - Result of payment
+- paymentId: 2332332233 (string, required) - Id of payment. Numeric string max 10 chars
+- status: 3 (PaymentStatus, sample, required) - Result status of payment.
+- paymentMethod: creditcard (OrderPayment, sample, required) - As for now, the only supported value is 'credit card'. Any other value results in error.
+- paid: 23 (number, optional) - see order.paid. Provided if is supported by Payement Gateway.
 
 ## PaymentResultResponse (fixed-type)
 - paid: 23 (number, required) - amount paid by customer
